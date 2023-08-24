@@ -33,8 +33,6 @@ const account4 = {
   pin: 4444,
 };
 
-const accounts = [account1, account2, account3, account4];
-
 // Elements
 const labelWelcome = document.querySelector('.welcome');
 const labelDate = document.querySelector('.date');
@@ -61,6 +59,26 @@ const inputLoanAmount = document.querySelector('.form__input--loan-amount');
 const inputCloseUsername = document.querySelector('.form__input--user');
 const inputClosePin = document.querySelector('.form__input--pin');
 
+const getType=(n)=>{
+  if (n>0)
+    return "deposit"
+  else
+    return "withdrawal"
+}
+
+const displayMovements=(movements)=>{
+  containerMovements.innerHTML="";
+  movements.forEach((mov,i)=>{
+    const type=getType(mov)
+    const html= `<div class="movements__row">
+    <div class="movements__type movements__type--${type}">${i+1} ${type}</div>
+    <div class="movements__value">${mov}</div>
+  </div>`
+    containerMovements.insertAdjacentHTML("afterbegin", html);
+  })
+}
+displayMovements(account1.movements)
+
 
 /////////////////////////////////////////////////
 /////////////////////////////////////////////////
@@ -75,18 +93,5 @@ const currencies = new Map([
 const movements = [200, 450, -400, 3000, -650, -130, 70, 1300];
 
 /////////////////////////////////////////////////
-
-function login(event){
-  event.preventDefault()
-  let flag=0;
-  const accountPin=inputLoginPin.value
-  accounts.forEach((account)=>{
-    if (account.pin==accountPin){
-      flag=1;
-    }
-  })
-  if (flag)
-  containerApp.style.opacity=1;
-}
 
 btnLogin.addEventListener("click", (event)=>login(event));
