@@ -7,7 +7,7 @@
 // Data
 const account1 = {
   owner: 'Jonas Schmedtmann',
-  movements: [200, 450, -400, 3000, -650, -130, 70, 1300], //Watch the video to understand what is this movements
+  movements: [200, 450, -400, 3000, -650, -130, 70, 1300], 
   interestRate: 1.2, // %
   pin: 1111,
 };
@@ -58,6 +58,19 @@ const inputTransferAmount = document.querySelector('.form__input--amount');
 const inputLoanAmount = document.querySelector('.form__input--loan-amount');
 const inputCloseUsername = document.querySelector('.form__input--user');
 const inputClosePin = document.querySelector('.form__input--pin');
+
+const transferAmount=document.querySelector('.form__input--amount')//see whats happening
+
+let currentDate = new Date();
+const today = new Date();
+const yyyy = today.getFullYear();
+let mm = today.getMonth() + 1; // Months start at 0!
+let dd = today.getDate();
+
+if (dd < 10) dd = '0' + dd;
+if (mm < 10) mm = '0' + mm;
+
+labelDate.innerText = dd + '/' + mm + '/' + yyyy;
 
 const getType=(n)=>{
   if (n>0)
