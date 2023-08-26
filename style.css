@@ -188,22 +188,12 @@ nav {
   margin-right: 2.5rem;
 }
 
-.summary__value--in,
-.summary__value--interest {
+.summary__value--in {
   color: #66c873;
 }
 
 .summary__value--out {
   color: #f5465d;
-}
-
-.btn--sort {
-  margin-left: auto;
-  border: none;
-  background: none;
-  font-size: 1.3rem;
-  font-weight: 500;
-  cursor: pointer;
 }
 
 /* OPERATIONS */

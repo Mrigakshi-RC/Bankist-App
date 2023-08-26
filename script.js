@@ -1,12 +1,5 @@
 'use strict';
-import { USERS } from "./constants.js";
-
-/////////////////////////////////////////////////
-/////////////////////////////////////////////////
-// BANKIST APP
-
-// Data
-
+import { USERS } from './constants.js';
 
 // Elements
 const labelWelcome = document.querySelector('.welcome');
@@ -33,8 +26,7 @@ const inputTransferAmount = document.querySelector('.form__input--amount');
 const inputLoanAmount = document.querySelector('.form__input--loan-amount');
 const inputCloseUsername = document.querySelector('.form__input--user');
 const inputClosePin = document.querySelector('.form__input--pin');
-
-const transferAmount=document.querySelector('.form__input--amount')//see whats happening
+const currentUser = 0;
 
 let currentDate = new Date();
 const today = new Date();
@@ -47,31 +39,54 @@ if (mm < 10) mm = '0' + mm;
 
 labelDate.innerText = dd + '/' + mm + '/' + yyyy;
 
-const getType=(n)=>{
-  if (n>0)
-    return "deposit"
-  else
-    return "withdrawal"
-}
+const getType = n => {
+  if (n > 0) return 'deposit';
+  else return 'withdrawal';
+};
 
-const displayMovements=(movements)=>{
-  containerMovements.innerHTML="";
-  movements.forEach((mov,i)=>{
-    const type=getType(mov)
-    const html= `<div class="movements__row">
-    <div class="movements__type movements__type--${type}">${i+1} ${type}</div>
+const displayMovements = movements => {
+  containerMovements.innerHTML = '';
+  movements.forEach((mov, i) => {
+    const type = getType(mov);
+    const html = `<div class="movements__row">
+    <div class="movements__type movements__type--${type}">${i + 1} ${type}</div>
     <div class="movements__value">${mov}</div>
-  </div>`
-    containerMovements.insertAdjacentHTML("afterbegin", html);
-  })
-}
-console.log(USERS[0].movements)
-displayMovements(USERS[0].movements)
+  </div>`;
+    containerMovements.insertAdjacentHTML('afterbegin', html);
+  });
+};
 
+const displayNewMovements = movements => {
+  USERS[currentUser].noOfMovements += 1;
+  movements.forEach(mov => {
+    const type = getType(mov);
+    const html = `<div class="movements__row">
+    <div class="movements__type movements__type--${type}">${USERS[currentUser].noOfMovements} ${type}</div>
+    <div class="movements__value">${mov}</div>
+  </div>`;
+    containerMovements.insertAdjacentHTML('afterbegin', html);
+  });
+};
 
-/////////////////////////////////////////////////
-/////////////////////////////////////////////////
-// LECTURES
+const updateCurrentBalance = movements => {
+  const sum = movements.reduce((acc, curr) => acc + curr, 0);
+  const symbol = labelBalance.innerText.at(-1);
+  labelBalance.innerText =
+    Number(labelBalance.innerText.slice(0, labelBalance.innerText.length - 1)) +
+    sum;
+  labelBalance.innerText = String(labelBalance.innerText) + symbol;
+};
+const handleTransaction = (event, amount, type) => {
+  event.preventDefault();
+  amount = type === 'withdrawal' ? amount * -1 : Number(amount);
+  const newMovement = [amount];
+  console.log(newMovement);
+  updateCurrentBalance(newMovement);
+  displayNewMovements(newMovement);
+};
+
+displayMovements(USERS[currentUser].movements);
+updateCurrentBalance(USERS[currentUser].movements);
 
 const currencies = new Map([
   ['USD', 'United States dollar'],
@@ -79,8 +94,9 @@ const currencies = new Map([
   ['GBP', 'Pound sterling'],
 ]);
 
-const movements = [200, 450, -400, 3000, -650, -130, 70, 1300];
-
-/////////////////////////////////////////////////
-
-btnLogin.addEventListener("click", (event)=>login(event));
+btnTransfer.addEventListener('click', event =>
+  handleTransaction(event, inputTransferAmount.value, 'withdrawal')
+);
+btnLoan.addEventListener('click', event =>
+  handleTransaction(event, inputLoanAmount.value, 'deposit')
+);
