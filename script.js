@@ -1,5 +1,5 @@
 'use strict';
-import { USERS } from './constants.js';
+import { USERS } from './data.js';
 
 // Elements
 const labelWelcome = document.querySelector('.welcome');
@@ -27,8 +27,38 @@ const inputLoanAmount = document.querySelector('.form__input--loan-amount');
 const inputCloseUsername = document.querySelector('.form__input--user');
 const inputClosePin = document.querySelector('.form__input--pin');
 const currentUser = 0;
+let usersCopy = [...USERS];
 
-let currentDate = new Date();
+const checkUserNo = pin => {
+  let index;
+  usersCopy.forEach((item, idx) => {
+    if (pin == item.pin) {
+      index = idx;
+    }
+  });
+  return index;
+};
+
+const initiateLogin = (event, pin) => {
+  event.preventDefault();
+  const userNo = checkUserNo(pin);
+  if (userNo || userNo === 0) {
+    containerApp.style.opacity = 1;
+    displayMovements(usersCopy[userNo].movements);
+    updateCurrentBalance(usersCopy[userNo].movements);
+  }
+};
+
+const initiateDeactivation = (event, user, pin) => {
+  event.preventDefault();
+  const size = usersCopy.length;
+  usersCopy = usersCopy.filter(item => item.owner !== user && item.pin != pin);
+  const newSize = usersCopy.length;
+  if (size !== newSize) {
+    containerApp.style.opacity = 0;
+  }
+};
+
 const today = new Date();
 const yyyy = today.getFullYear();
 let mm = today.getMonth() + 1; // Months start at 0!
@@ -57,11 +87,11 @@ const displayMovements = movements => {
 };
 
 const displayNewMovements = movements => {
-  USERS[currentUser].noOfMovements += 1;
+  usersCopy[currentUser].noOfMovements += 1;
   movements.forEach(mov => {
     const type = getType(mov);
     const html = `<div class="movements__row">
-    <div class="movements__type movements__type--${type}">${USERS[currentUser].noOfMovements} ${type}</div>
+    <div class="movements__type movements__type--${type}">${usersCopy[currentUser].noOfMovements} ${type}</div>
     <div class="movements__value">${mov}</div>
   </div>`;
     containerMovements.insertAdjacentHTML('afterbegin', html);
@@ -80,13 +110,9 @@ const handleTransaction = (event, amount, type) => {
   event.preventDefault();
   amount = type === 'withdrawal' ? amount * -1 : Number(amount);
   const newMovement = [amount];
-  console.log(newMovement);
   updateCurrentBalance(newMovement);
   displayNewMovements(newMovement);
 };
-
-displayMovements(USERS[currentUser].movements);
-updateCurrentBalance(USERS[currentUser].movements);
 
 const currencies = new Map([
   ['USD', 'United States dollar'],
@@ -94,9 +120,15 @@ const currencies = new Map([
   ['GBP', 'Pound sterling'],
 ]);
 
+btnLogin.addEventListener('click', event =>
+  initiateLogin(event, inputLoginPin.value)
+);
 btnTransfer.addEventListener('click', event =>
   handleTransaction(event, inputTransferAmount.value, 'withdrawal')
 );
 btnLoan.addEventListener('click', event =>
   handleTransaction(event, inputLoanAmount.value, 'deposit')
+);
+btnClose.addEventListener('click', event =>
+  initiateDeactivation(event, inputCloseUsername.value, inputClosePin.value)
 );
